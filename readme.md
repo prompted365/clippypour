@@ -12,6 +12,18 @@ Clippy-Dollop is an AI-driven, clipboard-free form-filling automation system tha
 - **Customizable Field Mapping:** Easily configure CSS selectors to target the appropriate form fields.
 - **Async and Modular:** Developed using Python’s async framework for scalable and responsive automation.
 
+```mermaid
+graph TD
+  A[User Copies Data] --> B[Clippy-Dollop Reads Clipboard Data]
+  B --> C[Splits Data Using '||' Delimiters]
+  C --> D[Maps Data to Form Fields]
+  D --> E[Identifies Corresponding CSS Selectors]
+  E --> F[Fills Form Fields One by One]
+  F --> G[Simulates Human Typing Delay]
+  G --> H[Form Filling Complete]
+  H --> I[Triggers Submission (Optional)]
+```
+
 ---
 
 ## Requirements
