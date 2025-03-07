@@ -21,7 +21,7 @@ graph TD
   E --> F[Fills Form Fields One by One]
   F --> G[Simulates Human Typing Delay]
   G --> H[Form Filling Complete]
-  H --> I[Triggers Submission (Optional)]
+  H --> I[Triggers Submission - Optional]
 ```
 
 ---
