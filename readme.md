@@ -1,65 +1,75 @@
-Clippy-Dollop
+# Clippy-Dollop
 
-Clippy-Dollop is an AI-driven, clipboard-free form-filling automation system that streams structured form data directly into multiple web form fields. By leveraging the robust Browser-Use library and Playwright, Clippy-Dollop bypasses traditional clipboard mechanics, enabling faster and more efficient web automation.
+Clippy-Dollop is an AI-driven, clipboard-free form-filling automation system that streams structured form data directly into multiple web form fields. By leveraging the robust [Browser-Use](https://github.com/browser-use/browser-use) library and Playwright, Clippy-Dollop bypasses traditional clipboard mechanics, enabling faster and more efficient web automation.
 
-⸻
+---
 
-Features
-	•	Clipboard-Free Streaming: Copy once and stream the data into several fields using a custom delimiter.
-	•	Efficient Form Filling: Bypass OS clipboard limitations to fill out forms quickly.
-	•	Browser-Based Automation: Built on Browser-Use’s powerful Playwright interface for real browser control.
-	•	Customizable Field Mapping: Easily configure CSS selectors to target the appropriate form fields.
-	•	Async and Modular: Developed using Python’s async framework for scalable and responsive automation.
+## Features
 
-⸻
+- **Clipboard-Free Streaming:** Copy once and stream the data into several fields using a custom delimiter.
+- **Efficient Form Filling:** Bypass OS clipboard limitations to fill out forms quickly.
+- **Browser-Based Automation:** Built on Browser-Use’s powerful Playwright interface for real browser control.
+- **Customizable Field Mapping:** Easily configure CSS selectors to target the appropriate form fields.
+- **Async and Modular:** Developed using Python’s async framework for scalable and responsive automation.
 
-Requirements
-	•	Python 3.11 or higher.
-	•	Browser-Use library.
-	•	Playwright (plus its dependencies and browser installations).
-	•	Environment variables set in a .env file (e.g., API keys).
+---
 
-⸻
+## Requirements
 
-Installation
-	1.	Clone the Repository:
+- Python 3.11 or higher.
+- [Browser-Use](https://github.com/browser-use/browser-use) library.
+- Playwright (plus its dependencies and browser installations).
+- Environment variables set in a `.env` file (e.g., API keys).
 
-git clone https://github.com/yourusername/clippy-dollop.git
-cd clippy-dollop
+---
 
+## Installation
 
-	2.	Set Up a Virtual Environment (optional but recommended):
+1. **Clone the Repository:**
 
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```bash
+   git clone https://github.com/yourusername/clippy-dollop.git
+   cd clippy-dollop
+   ```
 
+2. **Set Up a Virtual Environment (optional but recommended):**
 
-	3.	Install Dependencies:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-pip install -r requirements.txt
+3. **Install Dependencies:**
 
-	Note: Ensure that Browser-Use and Playwright are installed. Then, install the Playwright browsers:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-playwright install
+   > *Note: Ensure that Browser-Use and Playwright are installed. Then, install the Playwright browsers:*
+   >
+   ```bash
+   playwright install
+   ```
 
+4. **Configure Environment Variables:**
 
-	4.	Configure Environment Variables:
-Create a .env file in the project root and add any necessary variables (e.g., API keys):
+   Create a `.env` file in the project root and add any necessary variables (e.g., API keys):
 
-OPENAI_API_KEY=your_openai_api_key_here
+   ```bash
+   OPENAI_API_KEY=your_openai_api_key_here
+   ```
 
+---
 
+## Usage
 
-⸻
+Clippy-Dollop automates the process of filling out a web form by streaming a string of data—divided by the delimiter `||`—into predefined form fields. Simply update the form URL, data string, and field selectors in your script.
 
-Usage
-
-Clippy-Dollop automates the process of filling out a web form by streaming a string of data—divided by the delimiter ||—into predefined form fields. Simply update the form URL, data string, and field selectors in your script.
-
-Example Script
+### Example Script
 
 Below is a complete example of how to use Clippy-Dollop:
 
+```python
 import asyncio
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
@@ -122,31 +132,30 @@ if __name__ == "__main__":
         "#phone"       # Selector for the phone field
     ]
     asyncio.run(clippy_dollop_fill_form(form_url, form_data, field_selectors))
+```
 
+---
 
-
-⸻
-
-Testing
+## Testing
 
 Run the test suite with pytest to verify that everything is working correctly:
 
+```bash
 pytest
+```
 
+---
 
-
-⸻
-
-Contributing
+## Contributing
 
 Contributions are welcome! If you have suggestions or improvements, please open an issue or submit a pull request.
 
-⸻
+---
 
-License
+## License
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
-⸻
+---
 
 Clippy-Dollop aims to redefine automated form filling with a seamless, clipboard-free streaming approach. Enjoy and happy coding!
