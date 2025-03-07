@@ -40,8 +40,8 @@ graph TD
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/yourusername/clippy-dollop.git
-   cd clippy-dollop
+   git clone https://github.com/prompted365/clippypour.git
+   cd clippypour
    ```
 
 2. **Set Up a Virtual Environment (optional but recommended):**
