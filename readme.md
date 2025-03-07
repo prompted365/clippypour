@@ -15,7 +15,7 @@ Clippy-Dollop is an AI-driven, clipboard-free form-filling automation system tha
 ```mermaid
 graph TD
   A[User Copies Data] --> B[Clippy-Dollop Reads Clipboard Data]
-  B --> C[Splits Data Using '||' Delimiters]
+  B --> C[Splits Data Using double pipe Delimiters]
   C --> D[Maps Data to Form Fields]
   D --> E[Identifies Corresponding CSS Selectors]
   E --> F[Fills Form Fields One by One]
