@@ -170,4 +170,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 
-Clippy-Dollop aims to redefine automated form filling with a seamless, clipboard-free streaming approach. Enjoy and happy coding!
+Clippy-Dollop aims to redefine automated form filling with a seamless, clipboard-streaming approach. Enjoy and happy coding!
