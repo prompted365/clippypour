@@ -2,7 +2,7 @@
 
 Clippy-Pour is an AI-driven, clipboard-free form-filling automation system that streams structured form data directly into multiple web form fields. By leveraging the robust [Browser-Use](https://github.com/browser-use/browser-use) library and Playwright, Clippy-Dollop bypasses traditional clipboard mechanics, enabling faster and more efficient web automation.
 
-![Video](video.mp4)
+![Video]('video.mp4')
 ---
 
 ## Features
