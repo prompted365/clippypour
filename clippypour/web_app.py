@@ -10,9 +10,10 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from browser_use import Agent, Browser, BrowserConfig
 
-from .dollop import clippy_dollop_fill_form
+from .dollop import clippy_dollop_fill_form, analyze_form, map_clipboard_to_form
 from .form_analyzer import FormAnalyzer
 from .template_manager import TemplateManager
+from .controller import ClippyPourController
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,6 +21,7 @@ load_dotenv()
 # Global variables to store browser and agent instances
 browser_instance = None
 agent_instance = None
+controller_instance = None
 form_analyzer_instance = None
 current_analysis = None
 visual_selector_active = False
@@ -107,7 +109,7 @@ def create_app():
         
         # Initialize browser and agent if not already initialized
         def init_browser_and_analyze():
-            global browser_instance, agent_instance, form_analyzer_instance, current_analysis
+            global browser_instance, agent_instance, controller_instance, form_analyzer_instance, current_analysis
             
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
@@ -115,25 +117,31 @@ def create_app():
             try:
                 # Initialize browser if not already initialized
                 if browser_instance is None:
+                    # Initialize the template manager
+                    template_manager = TemplateManager()
+                    
+                    # Initialize the controller with the template manager
+                    controller_instance = ClippyPourController(template_manager=template_manager)
+                    
+                    # Initialize browser
                     browser_config = BrowserConfig(headless=False)
                     browser_instance = Browser(config=browser_config)
                     
-                    # Create agent
+                    # Create agent with our custom controller
                     task = "Analyze forms and fill them using ClippyPour."
                     llm = ChatOpenAI(model="gpt-4o")
-                    agent_instance = Agent(task=task, llm=llm, browser=browser_instance)
+                    agent_instance = Agent(
+                        task=task, 
+                        llm=llm, 
+                        browser=browser_instance,
+                        controller=controller_instance
+                    )
                     
                     # Create form analyzer
                     form_analyzer_instance = FormAnalyzer(agent_instance)
                 
-                # Navigate to the form URL
-                loop.run_until_complete(agent_instance.browser_context.navigate_to(form_url))
-                
-                # Wait for the page to load
-                time.sleep(2)
-                
-                # Analyze the form
-                analysis = loop.run_until_complete(form_analyzer_instance.analyze_current_page())
+                # Use the analyze_form function from dollop.py
+                analysis = loop.run_until_complete(analyze_form(form_url, headless=False))
                 
                 # Store the analysis for later use
                 current_analysis = analysis
@@ -156,7 +164,7 @@ def create_app():
     @app.route("/api/map-clipboard", methods=["POST"])
     def map_clipboard():
         """API endpoint to map clipboard data to form fields."""
-        global form_analyzer_instance, current_analysis
+        global current_analysis
         
         data = request.json
         
@@ -172,18 +180,14 @@ def create_app():
         if not current_analysis or not current_analysis.get("forms") or form_index >= len(current_analysis.get("forms", [])):
             return jsonify({"success": False, "message": "No form analysis available"}), 400
         
-        # Get the form data
-        form_data = current_analysis["forms"][form_index]
-        
         # Map clipboard data to form fields
         def run_mapping():
-            global form_analyzer_instance
-            
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             
             try:
-                mapping = loop.run_until_complete(form_analyzer_instance.suggest_data_mapping(form_data, clipboard_data))
+                # Use the map_clipboard_to_form function from dollop.py
+                mapping = loop.run_until_complete(map_clipboard_to_form(current_analysis, clipboard_data, headless=False))
                 return True, mapping
             except Exception as e:
                 return False, f"Error mapping clipboard data: {str(e)}"
