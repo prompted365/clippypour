@@ -3,10 +3,14 @@ import argparse
 import sys
 import os
 from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from browser_use import Agent, Browser, BrowserConfig
 
 from .context_manager import ContextManager
 from .ui import ClippyPourUI
 from .dollop import clippy_dollop_fill_form
+from .controller import ClippyPourController
+from .template_manager import TemplateManager
 
 # Load environment variables from .env file
 load_dotenv()
@@ -42,7 +46,27 @@ class ClippyPour:
             field_selectors (list[str]): List of CSS selectors for each form field (in order).
             headless (bool): Whether to run the browser in headless mode.
         """
-        await clippy_dollop_fill_form(form_url, form_data, field_selectors, headless)
+        # Initialize the template manager
+        template_manager = TemplateManager()
+        
+        # Initialize the controller with the template manager
+        controller = ClippyPourController(template_manager=template_manager)
+        
+        # Initialize a browser instance
+        browser_config = BrowserConfig(headless=headless)
+        browser = Browser(config=browser_config)
+        
+        # Create an Agent instance with a task description and our custom controller
+        task = "Fill out the form with the provided data using clippy-dollop method."
+        llm = ChatOpenAI(model="gpt-4o")
+        agent = Agent(task=task, llm=llm, browser=browser, controller=controller)
+        
+        try:
+            # Use the clippy_dollop_fill_form function
+            await clippy_dollop_fill_form(form_url, form_data, field_selectors, headless)
+        finally:
+            # Close the browser
+            await browser.close()
     
     async def close(self) -> None:
         """Close the application."""
