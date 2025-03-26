@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  clippypour:
+    build: .
+    ports:
+      - "12000:12000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SECRET_KEY=${SECRET_KEY:-dev-key-for-clippypour}
+    restart: unless-stopped

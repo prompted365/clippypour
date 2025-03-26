@@ -1,0 +1,8 @@
+browser-use>=0.1.0
+langchain-openai>=0.0.1
+python-dotenv>=1.0.0
+pyperclip>=1.8.2
+Pillow>=10.0.0
+playwright>=1.40.0
+asyncio>=3.4.3
+flask>=3.0.0
