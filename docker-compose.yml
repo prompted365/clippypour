@@ -10,4 +10,12 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - SECRET_KEY=${SECRET_KEY:-dev-key-for-clippypour}
+      - PORT=12000
+      - HOST=0.0.0.0
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:12000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

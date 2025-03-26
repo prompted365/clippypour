@@ -4,7 +4,8 @@ import asyncio
 import threading
 import time
 from pathlib import Path
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, send_from_directory
+from flask_cors import CORS
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from browser_use import Agent, Browser, BrowserConfig
@@ -27,6 +28,9 @@ selected_elements = []
 def create_app():
     """Create and configure the Flask application."""
     app = Flask(__name__)
+    
+    # Enable CORS
+    CORS(app, resources={r"/*": {"origins": "*"}})
     
     # Configure the app
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-key-for-clippypour")

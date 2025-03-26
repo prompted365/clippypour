@@ -6,6 +6,10 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Chrome for Playwright
@@ -20,7 +24,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Playwright browsers
-RUN pip install playwright && playwright install chromium
+RUN playwright install chromium
 
 # Copy the application code
 COPY . .
@@ -33,6 +37,8 @@ EXPOSE 12000
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
+ENV PORT=12000
+ENV HOST=0.0.0.0
 
-# Command to run the web server
-CMD ["python", "-m", "clippypour.main", "web", "--port", "12000"]
+# Command to run the web server with Gunicorn
+CMD gunicorn "clippypour.main:main_web()" --bind $HOST:$PORT --workers 1 --threads 8 --timeout 0
