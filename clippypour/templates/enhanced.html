@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClippyPour - Smart Form Filling Automation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='enhanced.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span>ClippyPour</span>
+                </a>
+                <nav class="nav">
+                    <a href="#" class="nav-link tab active" data-tab="fillForm">Fill Form</a>
+                    <a href="#" class="nav-link tab" data-tab="templates">Templates</a>
+                    <a href="#" class="nav-link tab" data-tab="help">Help</a>
+                    <div class="d-flex align-items-center ml-3">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="darkModeToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="ml-2">Dark Mode</span>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mt-4">
+        <!-- Fill Form Tab Content -->
+        <div class="tab-content active" data-tab="fillForm">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h2 class="card-title">Smart Form Filling</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="fillForm">
+                                <div class="form-group">
+                                    <label for="formUrl" class="form-label">Form URL:</label>
+                                    <div class="d-flex">
+                                        <input type="url" class="form-control" id="formUrl" name="formUrl" required placeholder="https://example.com/form">
+                                        <button type="button" class="btn btn-primary ml-2" id="analyzeButton">Analyze Form</button>
+                                    </div>
+                                    <small class="form-text">Enter the URL of the form you want to fill.</small>
+                                </div>
+                                
+                                <!-- Form Analysis Section (initially hidden) -->
+                                <div id="formAnalysisSection" style="display: none;">
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Form Analysis</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="formDetails"></div>
+                                            <div id="formFields"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="formData" class="form-label">Form Data (fields separated by "||"):</label>
+                                    <div class="d-flex">
+                                        <textarea class="form-control" id="formData" name="formData" rows="3" required placeholder="John Doe || john.doe@example.com || 123 Main St"></textarea>
+                                        <button type="button" class="btn btn-secondary ml-2" id="pasteClipboard">Paste</button>
+                                    </div>
+                                    <small class="form-text">Enter data for each field, separated by "||".</small>
+                                    <div id="clipboardSuggestion" class="alert alert-info mt-2" style="display: none;"></div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Field Selectors:</label>
+                                    <div id="selectors">
+                                        <div class="selector-group">
+                                            <input type="text" class="form-control" name="selectors[]" required placeholder="#name">
+                                            <button type="button" class="btn btn-danger remove-selector">-</button>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex mt-2">
+                                        <button type="button" class="btn btn-secondary" id="addSelector">Add Selector</button>
+                                        <button type="button" class="btn btn-info ml-2" id="visualSelector">Visual Selector</button>
+                                    </div>
+                                    <small class="form-text">Enter CSS selectors for each form field. Use the Visual Selector to pick elements from the page.</small>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" class="form-check-input" id="headless" name="headless">
+                                    <label class="form-check-label" for="headless">Run in headless mode</label>
+                                    <small class="form-text">Enable to run the browser in the background.</small>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary btn-lg">Fill Form</button>
+                            </form>
+                            
+                            <div id="result" class="mt-4" style="display: none;"></div>
+                            
+                            <!-- Save Template Section (initially hidden) -->
+                            <div id="saveTemplateSection" class="mt-4" style="display: none;">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Save as Template</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="templateName" class="form-label">Template Name:</label>
+                                            <input type="text" class="form-control" id="templateName" placeholder="My Form Template">
+                                        </div>
+                                        <button type="button" class="btn btn-success" id="saveTemplate">Save Template</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Templates Tab Content -->
+        <div class="tab-content" data-tab="templates">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Saved Templates</h2>
+                        </div>
+                        <div class="card-body">
+                            <p>Click on a template to load it.</p>
+                            <div id="templatesContainer" class="row"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Help Tab Content -->
+        <div class="tab-content" data-tab="help">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">How to Use ClippyPour</h2>
+                        </div>
+                        <div class="card-body">
+                            <h3>Quick Start Guide</h3>
+                            <ol>
+                                <li>
+                                    <strong>Enter a Form URL</strong>
+                                    <p>Start by entering the URL of the form you want to fill in the "Form URL" field.</p>
+                                </li>
+                                <li>
+                                    <strong>Analyze the Form</strong>
+                                    <p>Click the "Analyze Form" button to let ClippyPour detect form fields automatically.</p>
+                                </li>
+                                <li>
+                                    <strong>Prepare Your Data</strong>
+                                    <p>Enter your form data in the "Form Data" field, separating each field value with "||".</p>
+                                    <p>Example: <code>John Doe || john.doe@example.com || 123 Main St</code></p>
+                                </li>
+                                <li>
+                                    <strong>Verify Field Selectors</strong>
+                                    <p>The form analysis will suggest CSS selectors for each field. You can use these or specify your own.</p>
+                                </li>
+                                <li>
+                                    <strong>Fill the Form</strong>
+                                    <p>Click the "Fill Form" button to automatically fill the form with your data.</p>
+                                </li>
+                                <li>
+                                    <strong>Save as Template (Optional)</strong>
+                                    <p>After successfully filling a form, you can save the configuration as a template for future use.</p>
+                                </li>
+                            </ol>
+                            
+                            <h3>Advanced Features</h3>
+                            <ul>
+                                <li>
+                                    <strong>Visual Selector</strong>
+                                    <p>Use the "Visual Selector" button to visually select form fields from the page.</p>
+                                </li>
+                                <li>
+                                    <strong>Templates</strong>
+                                    <p>Save and reuse form configurations for websites you frequently visit.</p>
+                                </li>
+                                <li>
+                                    <strong>Headless Mode</strong>
+                                    <p>Enable "Run in headless mode" to fill forms in the background without showing a browser window.</p>
+                                </li>
+                            </ul>
+                            
+                            <h3>Tips for Best Results</h3>
+                            <ul>
+                                <li>Make sure the number of data fields matches the number of selectors.</li>
+                                <li>For complex forms, use the form analysis feature to detect fields automatically.</li>
+                                <li>Save frequently used forms as templates to save time.</li>
+                                <li>Use the Visual Selector for forms where CSS selectors are difficult to determine.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="mt-5 mb-3">
+        <div class="container">
+            <div class="text-center text-muted">
+                <p>ClippyPour &copy; 2023 - AI-driven form filling automation</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='enhanced.js') }}"></script>
+</body>
+</html>

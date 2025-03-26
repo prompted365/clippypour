@@ -6,10 +6,12 @@ ClippyPour is an AI-driven, clipboard-free form-filling automation system that s
 
 ## Features
 
+- **Smart Form Detection:** AI-powered analysis automatically detects form fields and suggests mappings.
+- **Visual Selector:** Point-and-click interface for selecting form fields without needing to know CSS selectors.
+- **Templates System:** Save and reuse form configurations for frequently visited websites.
 - **Clipboard-Free Streaming:** Copy once and stream the data into several fields using a custom delimiter.
 - **Efficient Form Filling:** Bypass OS clipboard limitations to fill out forms quickly.
 - **Browser-Based Automation:** Built on Browser-Use's powerful Playwright interface for real browser control.
-- **Customizable Field Mapping:** Easily configure CSS selectors to target the appropriate form fields.
 - **Multiple Interfaces:** Use the GUI, CLI, or web interface based on your needs.
 - **Computer Vision Support:** Optional computer vision features for more advanced automation.
 
@@ -59,6 +61,38 @@ pip install clippypour
 
 ## Usage
 
+### Web Application (Recommended)
+
+Start the web server with the enhanced interface:
+
+```bash
+python -m clippypour.main web --port 12000
+```
+
+Then open your browser to http://localhost:12000
+
+The enhanced web interface provides:
+- Smart form detection and analysis
+- Visual field selector
+- Templates management
+- Clipboard data mapping
+- Dark mode support
+
+#### Using Smart Form Detection
+
+1. Enter the URL of the form you want to fill
+2. Click "Analyze Form" to let ClippyPour detect form fields automatically
+3. Review the detected fields and click "Use All Fields" to add them to your configuration
+4. Paste your data in the "Form Data" field (separated by "||")
+5. Click "Fill Form" to automatically fill the form
+
+#### Using Templates
+
+1. After successfully filling a form, you can save it as a template
+2. Give your template a name and click "Save Template"
+3. Access your saved templates from the "Templates" tab
+4. Click on a template to load its configuration
+
 ### GUI Application
 
 Launch the GUI application with:
@@ -86,16 +120,6 @@ Run in headless mode:
 ```bash
 clippypour --url "https://example.com/form" --data "John Doe || john.doe@example.com" --selectors "#name" "#email" --headless
 ```
-
-### Web Application
-
-Start the web server:
-
-```bash
-python -m clippypour.main web --port 12000
-```
-
-Then open your browser to http://localhost:12000
 
 ### Python API
 

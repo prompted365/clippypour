@@ -79,14 +79,20 @@ def main_web():
     """Entry point for the web application."""
     from .web_app import create_app
     
-    parser = argparse.ArgumentParser(description="ClippyPour Web - Web interface for form filling")
+    parser = argparse.ArgumentParser(description="ClippyPour Web - Smart form filling automation")
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to bind the server to")
     parser.add_argument("--port", type=int, default=12000, help="Port to bind the server to")
     parser.add_argument("--debug", action="store_true", help="Run the server in debug mode")
+    parser.add_argument("--legacy", action="store_true", help="Use the legacy interface instead of the enhanced one")
     
     args = parser.parse_args()
     
     app = create_app()
+    
+    print(f"\nClippyPour is running at http://{args.host if args.host != '0.0.0.0' else 'localhost'}:{args.port}")
+    print("Enhanced interface with smart form detection is enabled")
+    print("Press Ctrl+C to stop the server\n")
+    
     app.run(host=args.host, port=args.port, debug=args.debug)
 
 
