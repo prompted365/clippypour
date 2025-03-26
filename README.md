@@ -23,6 +23,18 @@ ClippyPour is an AI-driven, clipboard-free form-filling automation system that s
 pip install clippypour
 ```
 
+### Using uv (Faster Installation)
+
+[uv](https://github.com/astral-sh/uv) is a fast Python package installer and resolver. It can significantly speed up the installation process:
+
+```bash
+# Install uv first
+pip install uv
+
+# Then use uv to install ClippyPour
+uv pip install clippypour
+```
+
 ### From Source
 
 1. **Clone the Repository:**
@@ -41,8 +53,15 @@ pip install clippypour
 
 3. **Install the Package:**
 
+   Standard installation:
    ```bash
    pip install -e .
+   ```
+   
+   Or with uv for faster installation:
+   ```bash
+   pip install uv
+   uv pip install -e .
    ```
 
 4. **Install Playwright Browsers:**
