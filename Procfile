@@ -1,1 +1,1 @@
-web: gunicorn "clippypour.main:main_web()" --preload
+web: python -m clippypour.main web
