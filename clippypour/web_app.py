@@ -14,6 +14,7 @@ from .dollop import clippy_dollop_fill_form, analyze_form, map_clipboard_to_form
 from .form_analyzer import FormAnalyzer
 from .template_manager import TemplateManager
 from .controller import ClippyPourController
+from .advanced_controller import AdvancedClippyPourController
 
 # Load environment variables from .env file
 load_dotenv()
@@ -26,6 +27,8 @@ form_analyzer_instance = None
 current_analysis = None
 visual_selector_active = False
 selected_elements = []
+use_advanced_controller = True
+command_palette_active = False
 
 def create_app():
     """Create and configure the Flask application."""
@@ -109,7 +112,7 @@ def create_app():
         
         # Initialize browser and agent if not already initialized
         def init_browser_and_analyze():
-            global browser_instance, agent_instance, controller_instance, form_analyzer_instance, current_analysis
+            global browser_instance, agent_instance, controller_instance, form_analyzer_instance, current_analysis, use_advanced_controller
             
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
@@ -121,14 +124,18 @@ def create_app():
                     template_manager = TemplateManager()
                     
                     # Initialize the controller with the template manager
-                    controller_instance = ClippyPourController(template_manager=template_manager)
+                    if use_advanced_controller:
+                        controller_instance = AdvancedClippyPourController(template_manager=template_manager)
+                        print("Using advanced controller with computer vision capabilities")
+                    else:
+                        controller_instance = ClippyPourController(template_manager=template_manager)
                     
                     # Initialize browser
                     browser_config = BrowserConfig(headless=False)
                     browser_instance = Browser(config=browser_config)
                     
                     # Create agent with our custom controller
-                    task = "Analyze forms and fill them using ClippyPour."
+                    task = "Analyze forms and fill them using ClippyPour. If selectors fail, use computer vision to find elements."
                     llm = ChatOpenAI(model="gpt-4o")
                     agent_instance = Agent(
                         task=task, 
@@ -246,6 +253,228 @@ def create_app():
             return jsonify({"success": True, "templates": templates})
         except Exception as e:
             return jsonify({"success": False, "message": f"Error listing templates: {str(e)}"}), 500
+            
+    @app.route("/api/toggle-advanced", methods=["POST"])
+    def toggle_advanced():
+        """API endpoint to toggle advanced controller features."""
+        global use_advanced_controller
+        
+        data = request.json
+        if data and "enabled" in data:
+            use_advanced_controller = data["enabled"]
+            return jsonify({
+                "success": True, 
+                "message": f"Advanced controller {'enabled' if use_advanced_controller else 'disabled'}"
+            })
+        
+        # If no data provided, just toggle the current state
+        use_advanced_controller = not use_advanced_controller
+        return jsonify({
+            "success": True, 
+            "message": f"Advanced controller {'enabled' if use_advanced_controller else 'disabled'}"
+        })
+    
+    @app.route("/api/command-palette", methods=["POST"])
+    def toggle_command_palette():
+        """API endpoint to toggle the command palette."""
+        global agent_instance, command_palette_active
+        
+        data = request.json
+        for_agent = data.get("for_agent", False) if data else False
+        
+        if not agent_instance:
+            return jsonify({"success": False, "message": "Agent not initialized"}), 400
+        
+        def run_command_palette():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            try:
+                if command_palette_active:
+                    # Close the command palette
+                    result = loop.run_until_complete(agent_instance.run_action(
+                        "Close command palette",
+                        for_agent=for_agent
+                    ))
+                    command_palette_active = False
+                    return True, f"Command palette closed for {'AI agent' if for_agent else 'human'}"
+                else:
+                    # Open the command palette
+                    result = loop.run_until_complete(agent_instance.run_action(
+                        "Open command palette",
+                        for_agent=for_agent
+                    ))
+                    command_palette_active = True
+                    return True, f"Command palette opened for {'AI agent' if for_agent else 'human'}"
+            except Exception as e:
+                return False, f"Error toggling command palette: {str(e)}"
+            finally:
+                loop.close()
+        
+        thread = threading.Thread(target=run_command_palette)
+        thread.start()
+        thread.join()
+        
+        success, message = thread._target()
+        return jsonify({"success": success, "message": message})
+        
+    @app.route("/api/find-element-by-vision", methods=["POST"])
+    def find_element_by_vision():
+        """API endpoint to find an element using computer vision."""
+        global agent_instance, use_advanced_controller
+        
+        data = request.json
+        if not data:
+            return jsonify({"success": False, "message": "No data provided"}), 400
+        
+        element_description = data.get("description")
+        if not element_description:
+            return jsonify({"success": False, "message": "Missing element description"}), 400
+        
+        if not agent_instance:
+            return jsonify({"success": False, "message": "Agent not initialized"}), 400
+        
+        if not use_advanced_controller:
+            return jsonify({"success": False, "message": "Advanced controller is not enabled"}), 400
+        
+        def run_vision_search():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            try:
+                # Use the find_element_by_vision action
+                result = loop.run_until_complete(agent_instance.run_action(
+                    "Find element by vision",
+                    element_description=element_description
+                ))
+                
+                vision_result = json.loads(result.extracted_content)
+                return True, vision_result
+            except Exception as e:
+                return False, f"Error finding element by vision: {str(e)}"
+            finally:
+                loop.close()
+        
+        thread = threading.Thread(target=run_vision_search)
+        thread.start()
+        thread.join()
+        
+        success, result = thread._target()
+        if success:
+            return jsonify({"success": True, "result": result})
+        else:
+            return jsonify({"success": False, "message": result}), 500
+            
+    @app.route("/api/click-at-coordinates", methods=["POST"])
+    def click_at_coordinates():
+        """API endpoint to click at specific coordinates."""
+        global agent_instance, use_advanced_controller
+        
+        data = request.json
+        if not data:
+            return jsonify({"success": False, "message": "No data provided"}), 400
+        
+        x = data.get("x")
+        y = data.get("y")
+        if x is None or y is None:
+            return jsonify({"success": False, "message": "Missing coordinates"}), 400
+        
+        if not agent_instance:
+            return jsonify({"success": False, "message": "Agent not initialized"}), 400
+        
+        if not use_advanced_controller:
+            return jsonify({"success": False, "message": "Advanced controller is not enabled"}), 400
+        
+        def run_click():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            try:
+                # Use the click_at_coordinates action
+                result = loop.run_until_complete(agent_instance.run_action(
+                    "Click at coordinates",
+                    x=x,
+                    y=y
+                ))
+                
+                return True, result.extracted_content
+            except Exception as e:
+                return False, f"Error clicking at coordinates: {str(e)}"
+            finally:
+                loop.close()
+        
+        thread = threading.Thread(target=run_click)
+        thread.start()
+        thread.join()
+        
+        success, message = thread._target()
+        return jsonify({"success": success, "message": message})
+        
+    @app.route("/api/wait", methods=["POST"])
+    def wait_action():
+        """API endpoint to perform various wait actions."""
+        global agent_instance, use_advanced_controller
+        
+        data = request.json
+        if not data:
+            return jsonify({"success": False, "message": "No data provided"}), 400
+        
+        wait_type = data.get("type", "fixed")
+        if wait_type not in ["fixed", "element", "navigation", "network"]:
+            return jsonify({"success": False, "message": "Invalid wait type"}), 400
+        
+        if not agent_instance:
+            return jsonify({"success": False, "message": "Agent not initialized"}), 400
+        
+        if not use_advanced_controller:
+            return jsonify({"success": False, "message": "Advanced controller is not enabled"}), 400
+        
+        def run_wait():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            try:
+                if wait_type == "fixed":
+                    seconds = data.get("seconds", 1.0)
+                    result = loop.run_until_complete(agent_instance.run_action(
+                        "Wait fixed time",
+                        seconds=seconds
+                    ))
+                elif wait_type == "element":
+                    selector = data.get("selector")
+                    timeout = data.get("timeout", 30000)
+                    if not selector:
+                        return False, "Missing selector for element wait"
+                    result = loop.run_until_complete(agent_instance.run_action(
+                        "Wait for element",
+                        selector=selector,
+                        timeout=timeout
+                    ))
+                elif wait_type == "navigation":
+                    timeout = data.get("timeout", 30000)
+                    result = loop.run_until_complete(agent_instance.run_action(
+                        "Wait for navigation",
+                        timeout=timeout
+                    ))
+                elif wait_type == "network":
+                    timeout = data.get("timeout", 30000)
+                    result = loop.run_until_complete(agent_instance.run_action(
+                        "Wait for network idle",
+                        timeout=timeout
+                    ))
+                
+                return True, result.extracted_content
+            except Exception as e:
+                return False, f"Error during wait action: {str(e)}"
+            finally:
+                loop.close()
+        
+        thread = threading.Thread(target=run_wait)
+        thread.start()
+        thread.join()
+        
+        success, message = thread._target()
+        return jsonify({"success": success, "message": message})
     
     @app.route("/api/templates/<template_id>", methods=["GET"])
     def get_template(template_id):
