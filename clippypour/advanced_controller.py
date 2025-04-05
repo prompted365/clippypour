@@ -223,7 +223,7 @@ class AdvancedClippyPourController(ClippyPourController):
             )
         
         @self.action("Wait for element")
-        async def wait_for_element(selector: str, timeout: int = 30000, browser: Browser) -> ActionResult:
+        async def wait_for_element(selector: str, browser: Browser, timeout: int = 30000) -> ActionResult:
             """
             Wait for an element to appear on the page.
             
@@ -248,7 +248,7 @@ class AdvancedClippyPourController(ClippyPourController):
                 )
         
         @self.action("Wait for navigation")
-        async def wait_for_navigation(timeout: int = 30000, browser: Browser) -> ActionResult:
+        async def wait_for_navigation(browser: Browser, timeout: int = 30000) -> ActionResult:
             """
             Wait for page navigation to complete.
             
@@ -272,7 +272,7 @@ class AdvancedClippyPourController(ClippyPourController):
                 )
         
         @self.action("Wait for network idle")
-        async def wait_for_network_idle(timeout: int = 30000, browser: Browser) -> ActionResult:
+        async def wait_for_network_idle(browser: Browser, timeout: int = 30000) -> ActionResult:
             """
             Wait for network to become idle (no requests for 500ms).
             
@@ -296,7 +296,7 @@ class AdvancedClippyPourController(ClippyPourController):
                 )
         
         @self.action("Wait fixed time")
-        async def wait_fixed_time(seconds: float, browser: Browser) -> ActionResult:
+        async def wait_fixed_time(browser: Browser, seconds: float = 1.0) -> ActionResult:
             """
             Wait for a fixed amount of time.
             
