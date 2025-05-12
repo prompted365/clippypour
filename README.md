@@ -1,6 +1,6 @@
 # ClippyPour
 
-ClippyPour is an AI-driven, clipboard-free form-filling automation system that streams structured form data directly into multiple web form fields. By leveraging the robust [Browser-Use](https://github.com/browser-use/browser-use) library and Playwright, ClippyPour bypasses traditional clipboard mechanics, enabling faster and more efficient web automation.
+ClippyPour is an AI-driven, copy/paste free form-filling automation system that streams structured form data directly into multiple web form fields. By leveraging the robust [Browser-Use](https://github.com/browser-use/browser-use) library and Playwright, ClippyPour bypasses traditional clipboard mechanics, enabling faster and more efficient web automation.
 
 ![ClippyPour Demo](video.mp4)
 
